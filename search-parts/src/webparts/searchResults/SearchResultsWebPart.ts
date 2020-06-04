@@ -71,6 +71,7 @@ import { Toggle, GlobalSettings } from 'office-ui-fabric-react';
 import IQueryModifierConfiguration from '../../models/IQueryModifierConfiguration';
 import { SearchHelper } from '../../helpers/SearchHelper';
 import { StringHelper } from '../../helpers/StringHelper';
+import { UrlHelper } from '../../helpers/UrlHelper';
 
 export default class SearchResultsWebPart extends BaseClientSideWebPart<ISearchResultsWebPartProps> implements IDynamicDataCallables {
 
@@ -233,6 +234,16 @@ export default class SearchResultsWebPart extends BaseClientSideWebPart<ISearchR
 
         const currentLocaleId = LocalizationHelper.getLocaleId(this.context.pageContext.cultureInfo.currentCultureName);
         const queryModifier = this._queryModifierInstance && this._queryModifierInstance.isInitialized ? this._queryModifierInstance.instance : null;
+
+        // START OF SCOPED SEARCH CODE
+        //Check for scoped search parameter in query string
+        const scopePath = UrlHelper.getQueryStringParam("scope", window.location.href);
+        console.log(`Found scope : ${scopePath}`);
+        if(scopePath && scopePath.length > 0){
+            queryTemplate = `(PATH:${scopePath} OR SiteID:${scopePath}) AND ${queryTemplate}`;
+            console.log(`Query Template : ${queryTemplate}`);
+        }
+        // END OF SCOPED SEARCH CODE
 
         // Configure the provider before the query according to our needs
         this._searchService = update(this._searchService, {
