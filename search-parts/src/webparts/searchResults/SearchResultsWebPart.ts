@@ -300,7 +300,17 @@ export default class SearchResultsWebPart extends BaseClientSideWebPart<ISearchR
 
                         const searchVerticalSourceData: ISearchVerticalSourceData = this._searchVerticalSourceData.tryGetValue();
                         const otherVerticals = searchVerticalSourceData.verticalsConfiguration.filter(v => { return v.key !== searchVerticalSourceData.selectedVertical.key; });
-                        searchService.getSearchVerticalCounts(queryKeywords, otherVerticals, searchService.enableQueryRules).then((verticalsInfos) => {
+
+                        // START OF SCOPED SEARCH CODE
+                        //Check for scoped search parameter in query string
+                        const scopePath = UrlHelper.getQueryStringParam("scope", window.location.href);
+                        let verticalCountQuery = queryKeywords;
+                        if(scopePath && scopePath.length > 0){
+                            verticalCountQuery = `(PATH:${scopePath} OR SiteID:${scopePath}) AND ${verticalCountQuery}`;
+                        }
+                        // END OF SCOPED SEARCH CODE
+
+                        searchService.getSearchVerticalCounts(verticalCountQuery, otherVerticals, searchService.enableQueryRules).then((verticalsInfos) => {
 
                             let currentCount = results.PaginationInformation ? results.PaginationInformation.TotalRows : undefined;
 
