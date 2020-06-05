@@ -8,13 +8,24 @@ import styles from '../SearchBoxWebPart.module.scss';
 import { ITheme } from '@uifabric/styling';
 import SearchBoxAutoComplete from '../SearchBoxAutoComplete/SearchBoxAutoComplete';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import { IconButton } from 'office-ui-fabric-react/lib/Button';
+import { IconButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react';
 
 export default class SearchBoxContainer extends React.Component<ISearchBoxContainerProps, ISearchBoxContainerState> {
+
+  private _srcUrl:string;
+  private _srcTitle:string;
+  private _scope:string;
+  private _ref:string;
 
   public constructor(props: ISearchBoxContainerProps) {
 
     super(props);
+
+    this._srcUrl = decodeURIComponent(UrlHelper.getQueryStringParam("source", window.location.href));
+    this._srcTitle = decodeURIComponent(UrlHelper.getQueryStringParam("sourceTitle", window.location.href));
+    this._scope = UrlHelper.getQueryStringParam("scope", window.location.href);
+    this._ref = UrlHelper.getQueryStringParam("ref", window.location.href);
 
     this.state = {
       searchInputValue: (props.inputValue) ? decodeURIComponent(props.inputValue) : '',
@@ -135,7 +146,37 @@ export default class SearchBoxContainer extends React.Component<ISearchBoxContai
       <div className={styles.searchBox}>
         { renderErrorMessage }
         { renderSearchBox }
+        { (this._ref || this._scope) && (
+          <div className={styles.scopeControls}>
+            <ChoiceGroup
+              label="Scope"
+              options={[
+                { key: 'ALL', text: 'All'},
+                { key: 'SCOPED', text: this._srcTitle}
+              ]}
+              defaultSelectedKey={ this._scope && this._scope.length > 0 ? "SCOPED" : "ALL"}
+              onChange={this._onScopeChange}
+              className={styles.scopeContainer}
+            ></ChoiceGroup>
+            <DefaultButton href={this._srcUrl}>{this._srcTitle}</DefaultButton>
+          </div>
+        )}
+        
       </div>
     );
+  }
+
+  private _onScopeChange(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): void {
+
+    let newUrl:string = "";
+    if(option.key == "ALL"){
+      newUrl = window.location.href.replace('scope=','ref=');
+    }
+    else
+    {
+      newUrl = window.location.href.replace('ref=','scope=');
+    }
+    window.location.href = newUrl;
+
   }
 }

@@ -109,6 +109,23 @@
         border-right: 1px solid #ccc;
         box-sizing: border-box;
     }
+
+    .scopeControls{
+        display: flex;
+        flex-direction: row;
+        padding-top: 10px;
+        .scopeContainer{
+            flex-grow: 1;
+            display: block;
+            :global(.ms-ChoiceFieldGroup-flexContainer){
+                display:flex !important;
+                flex-direction: row;
+                :global(.ms-ChoiceField){
+                    padding-right: 10px;
+                }
+            }
+        }
+    }
 }
 
 .parentStackingCtx {
