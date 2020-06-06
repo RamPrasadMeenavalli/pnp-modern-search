@@ -170,11 +170,17 @@ export default class SearchBoxContainer extends React.Component<ISearchBoxContai
 
     let newUrl:string = "";
     if(option.key == "ALL"){
-      newUrl = window.location.href.replace('scope=','ref=');
+      // When all is selected redirect to Search.aspx
+      newUrl = window.location.href
+        .replace('scope=','ref=')
+        .replace('/ScopedSearch.aspx', '/Search.aspx');
     }
     else
     {
-      newUrl = window.location.href.replace('ref=','scope=');
+      //When scope is selected redirect to ScopedSearch.aspx
+      newUrl = window.location.href
+        .replace('ref=','scope=')
+        .replace('/Search.aspx', '/ScopedSearch.aspx');;
     }
     window.location.href = newUrl;
 
